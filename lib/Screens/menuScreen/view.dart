@@ -25,7 +25,7 @@ class _ViewState extends State<View> {
   @override
   void initState() {
     super.initState();
-    print(widget.country);
+
     nameController.text = widget.country['name'];
     priceController.text = widget.country['price'].toString();
     String image = widget.country['image'].toString();
@@ -45,6 +45,7 @@ class _ViewState extends State<View> {
     return image?.path;
   }
 
+  bool isButtonActive = true;
   Future<String?> uploadImage(PickedFile image) async {
     User user = FirebaseAuth.instance.currentUser!;
     final _uid = user.uid;
@@ -134,29 +135,46 @@ class _ViewState extends State<View> {
             color: Colors.transparent,
             child: RaisedButton(
                 color: Colors.deepPurple[200],
-                onPressed: () async {
-                  User user = FirebaseAuth.instance.currentUser!;
-                  final _uid = user.uid;
+                onPressed: isButtonActive
+                    ? () async {
+                        User user = FirebaseAuth.instance.currentUser!;
+                        final _uid = user.uid;
 
-                  Reference db = await FirebaseStorage.instance
-                      .ref()
-                      .child('${getImageName(_image!)}');
-                  UploadTask uploadTask = db.putFile(File(_image!.path));
-                  uploadTask.snapshotEvents.listen((event) {
-                    print(event.bytesTransferred.toString() +
-                        "/t" +
-                        event.totalBytes.toString());
-                  });
-                  uploadTask.whenComplete(() async {
-                    var uploadPath =
-                        await uploadTask.snapshot.ref.getDownloadURL();
+                        Reference db = await FirebaseStorage.instance
+                            .ref()
+                            .child('${getImageName(_image!)}');
+                        setState(() {
+                          isButtonActive = false;
+                        });
+                        if (_image!.path != "") {
+                          UploadTask uploadTask =
+                              db.putFile(File(_image!.path));
+                          uploadTask.snapshotEvents.listen((event) {
+                            print(event.bytesTransferred.toString() +
+                                "/t" +
+                                event.totalBytes.toString());
+                          });
 
-                    widget.db.update(widget.country['id'], nameController.text,
-                        uploadPath, double.parse(priceController.text));
-
-                    Navigator.pop(context, true);
-                  });
-                },
+                          uploadTask.whenComplete(() async {
+                            String uploadPath =
+                                await uploadTask.snapshot.ref.getDownloadURL();
+                            widget.db.update(
+                                widget.country['id'],
+                                nameController.text,
+                                uploadPath,
+                                priceController.text);
+                            Navigator.pop(context, true);
+                          });
+                        } else {
+                          widget.db.update(
+                              widget.country['id'],
+                              nameController.text,
+                              widget.country['image'],
+                              priceController.text);
+                          Navigator.pop(context, true);
+                        }
+                      }
+                    : null,
                 child: Text(
                   "Save",
                   style: TextStyle(color: Colors.white),

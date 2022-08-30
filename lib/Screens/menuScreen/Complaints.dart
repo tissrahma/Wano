@@ -64,6 +64,7 @@ class _ComplaintsState extends State<Complaints> {
     return Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.deepPurple[200],
+          actions: [],
         ),
         drawer: Drawer(
           backgroundColor: Colors.deepPurple,

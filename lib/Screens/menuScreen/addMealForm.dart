@@ -16,17 +16,10 @@ class AddMealForm extends StatefulWidget {
   State<AddMealForm> createState() => _AddMealFormState();
 }
 
-@override
-void initState() {
-  initState();
-}
-
 final CollectionReference meals =
     FirebaseFirestore.instance.collection('meals');
-
 TextEditingController _nameController = TextEditingController();
 TextEditingController _priceController = TextEditingController();
-
 String? singleImage;
 
 String getImageName(PickedFile image) {
@@ -55,18 +48,29 @@ uploadImage(PickedFile image) async {
   await uploadTask.whenComplete(() async {
     var uploadPath = await uploadTask.snapshot.ref.getDownloadURL();
     if (uploadPath.isNotEmpty) {
-      await FirebaseFirestore.instance.collection("meals").doc().set({
+      await FirebaseFirestore.instance.collection("meals").add({
         'name': _nameController.text,
         'image': uploadPath,
         'price': _priceController.text
       }).then((value) => print("Record Inserted"));
       return uploadPath;
-    } else {
-      print("error");
     }
   });
 }
+
+bool isButtonActive = true;
+
 class _AddMealFormState extends State<AddMealForm> {
+  @override
+  void initState() {
+    super.initState();
+    setState(() {
+      _nameController.clear();
+      _priceController.clear();
+      _image = PickedFile("");
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -145,7 +149,6 @@ class _AddMealFormState extends State<AddMealForm> {
                       return Container(
                         child: Image.file(
                           File(snap.data!),
-                          
                         ),
                         color: Colors.blue,
                       );
@@ -164,13 +167,53 @@ class _AddMealFormState extends State<AddMealForm> {
             color: Colors.transparent,
             child: RaisedButton(
                 color: Colors.deepPurple[200],
-                onPressed: () async {
-                  await uploadImage(_image!);
-                  Navigator.of(context).pushReplacement(MaterialPageRoute(
-                      builder: (context) => EmployeeScreen()));
-                  print("_______________________________");
-                  print(uploadImage(_image!));
-                },
+                onPressed: isButtonActive
+                    ? () async {
+                        if (_priceController.text != "" &&
+                            _nameController.text != "" &&
+                            _image!.path.isNotEmpty) {
+                          //   await uploadImage(_image!);
+                          User user = FirebaseAuth.instance.currentUser!;
+                          final _uid = user.uid;
+                          Reference db = FirebaseStorage.instance
+                              .ref()
+                              .child('${getImageName(_image!)}');
+                          UploadTask uploadTask =
+                              db.putFile(File(_image!.path));
+                          uploadTask.snapshotEvents.listen((event) {
+                            print(event.bytesTransferred.toString() +
+                                "/t" +
+                                event.totalBytes.toString());
+                          });
+
+                          await uploadTask.whenComplete(() async {
+                            var uploadPath =
+                                await uploadTask.snapshot.ref.getDownloadURL();
+                            if (uploadPath.isNotEmpty) {
+                              await FirebaseFirestore.instance
+                                  .collection("meals")
+                                  .doc()
+                                  .set({
+                                'name': _nameController.text,
+                                'image': uploadPath,
+                                'price': _priceController.text
+                              }).then((value) => print("Record Inserted"));
+                              return uploadPath;
+                            }
+                          });
+
+                          Navigator.of(context).pushReplacement(
+                              MaterialPageRoute(
+                                  builder: (context) => EmployeeScreen()));
+                        } else {
+                          final snackBar = SnackBar(
+                            content: const Text("plz enter all data  "),
+                            backgroundColor: Colors.red,
+                          );
+                          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                        }
+                      }
+                    : null,
                 child: Text(
                   "Save",
                   style: TextStyle(color: Colors.white),

@@ -7,16 +7,6 @@ class Database {
     firestore = FirebaseFirestore.instance;
   }
 
-  Future<void> createMeal(String name, String image, double price) async {
-    try {
-      await FirebaseFirestore.instance
-          .collection("meals")
-          .add({'name': name, 'image': image, 'price': price});
-    } catch (e) {
-      print(e);
-    }
-  }
-
   Future<void> delete(String id) async {
     try {
       await firestore.collection("meals").doc(id).delete();
@@ -49,12 +39,12 @@ class Database {
   }
 
   Future<void> update(
-      String id, String name, String image, double price) async {
+      String id, String name, String image, String price) async {
     try {
       await firestore
           .collection("meals")
           .doc(id)
-          .update({'name': name, 'price ': price, 'image': image});
+          .update({'name': name, 'image': image, 'price': price});
     } catch (e) {
       print(e);
     }
