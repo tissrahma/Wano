@@ -44,15 +44,27 @@ class _LogInState extends State<LogIn> {
       }
       return null;
     }
+
     getpos() async {
       if (FirebaseAuth.instance.currentUser?.uid != null) {
         String? _uid = FirebaseAuth.instance.currentUser?.uid;
-        final DocumentSnapshot userDoc =
-            await FirebaseFirestore.instance.collection('users').doc().get();
+        final DocumentSnapshot userDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(_uid)
+            .get();
         String pos = await userDoc.get('position').toString();
-        return pos;
-      } else {}
+        print("*******************");
+        print(pos);
+        if (pos == "client") {
+          await Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (context) => ClientEssai()));
+        } else if(pos == "employee") {
+          await Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (context) => EmployeeScreen()));
+        }
+      } 
     }
+
     bool _obscureText = true;
     return Form(
       child: Column(
@@ -90,72 +102,53 @@ class _LogInState extends State<LogIn> {
             ),
           ),
           const SizedBox(height: defaultPadding),
-          FutureBuilder(
-              future: getpos(),
-              builder: (context, snap) {
-                return Hero(
-                  tag: "login_btn",
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      if (_emailController.text != "" &&
-                          _passwordController.text != "") {
-                        try {
-                          print("_____________");
-                          print(snap.data);
-                          UserCredential userCredential = await FirebaseAuth
-                              .instance
-                              .signInWithEmailAndPassword(
-                                  email: _emailController.text,
-                                  password: _passwordController.text);
-                          if (snap.data == "employee") {
-                            print("________________");
-                            print(snap.data);
-                            await Navigator.of(context).pushReplacement(
-                                MaterialPageRoute(
-                                    builder: (context) => EmployeeScreen()));
-                          } else {
-                            await Navigator.of(context).pushReplacement(
-                                MaterialPageRoute(
-                                    builder: (context) => ClientEssai()));
-                          }
-                        } on FirebaseAuthException catch (e) {
-                          if (e.code == 'user-not-found') {
-                            final snackBar = SnackBar(
-                              content: const Text("user not found  "),
-                              backgroundColor: Colors.red,
-                            );
-                            ScaffoldMessenger.of(context)
-                                .showSnackBar(snackBar);
-                          } else if (e.code == 'wrong-password') {
-                            final snackBar = SnackBar(
-                              content: const Text("wrong password  "),
-                              backgroundColor: Colors.red,
-                            );
-                            ScaffoldMessenger.of(context)
-                                .showSnackBar(snackBar);
-                          } else {
-                            final snackBar = SnackBar(
-                              content: const Text("something went wrong "),
-                              backgroundColor: Colors.red,
-                            );
-                            ScaffoldMessenger.of(context)
-                                .showSnackBar(snackBar);
-                          }
-                        }
-                      } else {
-                        final snackBar = SnackBar(
-                          content: const Text("plz enter your data  "),
-                          backgroundColor: Colors.red,
-                        );
-                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                      }
-                    },
-                    child: Text(
-                      "Login".toUpperCase(),
-                    ),
-                  ),
+          ElevatedButton(
+            onPressed: () async {
+              if (_emailController.text != "" &&
+                  _passwordController.text != "") {
+                try {
+                  UserCredential userCredential = await FirebaseAuth.instance
+                      .signInWithEmailAndPassword(
+                          email: _emailController.text,
+                          password: _passwordController.text);
+
+                  print("________________");
+
+                  //  print(await getpos);
+                  getpos();
+                } on FirebaseAuthException catch (e) {
+                  if (e.code == 'user-not-found') {
+                    final snackBar = SnackBar(
+                      content: const Text("user not found  "),
+                      backgroundColor: Colors.red,
+                    );
+                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                  } else if (e.code == 'wrong-password') {
+                    final snackBar = SnackBar(
+                      content: const Text("wrong password  "),
+                      backgroundColor: Colors.red,
+                    );
+                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                  } else {
+                    final snackBar = SnackBar(
+                      content: const Text("something went wrong "),
+                      backgroundColor: Colors.red,
+                    );
+                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                  }
+                }
+              } else {
+                final snackBar = SnackBar(
+                  content: const Text("plz enter your data  "),
+                  backgroundColor: Colors.red,
                 );
-              }),
+                ScaffoldMessenger.of(context).showSnackBar(snackBar);
+              }
+            },
+            child: Text(
+              "Login".toUpperCase(),
+            ),
+          ),
           const SizedBox(height: defaultPadding),
           AlreadyHaveAnAccountCheck(
             press: () {

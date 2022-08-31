@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/Screens/Login/components/EmployeeLogin.dart';
-import 'package:flutter_application_1/Screens/Login/components/loginEmployeeScreen.dart';
+
 import 'package:flutter_application_1/Screens/Signup/signup_screen.dart';
 import 'package:flutter_application_1/Screens/menuScreen/ClientEssai.dart';
 import 'package:flutter_application_1/Screens/menuScreen/ClientScreen.dart';
@@ -10,11 +9,13 @@ import 'package:flutter_application_1/constants.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:sizer/sizer.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:toast/toast.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   runApp(Sizer(builder: (context, orientation, deviceType) {
+    ToastContext().init(context);
     return MaterialApp(
       builder: (context, widget) => ResponsiveWrapper.builder(
         BouncingScrollWrapper.builder(context, widget!),
@@ -54,7 +55,7 @@ void main() async {
               borderSide: BorderSide.none,
             ),
           )),
-      home: loginEmployeeScreen(),
+      home: ClientEssai(),
     );
   }));
 }

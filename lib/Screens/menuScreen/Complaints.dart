@@ -4,6 +4,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_application_1/Screens/menuScreen/Cart.dart';
+import 'package:flutter_application_1/Screens/menuScreen/ClientEssai.dart';
 
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get_connect.dart';
@@ -39,9 +41,9 @@ Future sendmail(
         'template_id': templateId,
         'user_id': userId,
         'template_params': {
-          'text': subject,
+          'text': message,
           'user_email': email,
-          'title': message
+          'title': subject
         }
       }));
   print(response.body);
@@ -64,7 +66,15 @@ class _ComplaintsState extends State<Complaints> {
     return Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.deepPurple[200],
-          actions: [],
+          actions: [
+            IconButton(
+                icon: Icon(Icons.keyboard_return),
+                onPressed: () async {
+                  
+                  Navigator.of(context).pushReplacement(
+                      MaterialPageRoute(builder: (context) => ClientEssai()));
+                })
+          ],
         ),
         drawer: Drawer(
           backgroundColor: Colors.deepPurple,

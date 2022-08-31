@@ -8,7 +8,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/Screens/Login/components/loginEmployeeScreen.dart';
+
 import 'package:flutter_application_1/Screens/Login/login_screen.dart';
 import 'package:flutter_application_1/Screens/Signup/signup_screen.dart';
 import 'package:flutter_application_1/Screens/menuScreen/EmployeeScreen.dart';
@@ -86,9 +86,10 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
         actions: [
           IconButton(
               icon: Icon(Icons.logout),
-              onPressed: () {
-                Navigator.of(context).pushReplacement(MaterialPageRoute(
-                    builder: (context) => loginEmployeeScreen()));
+              onPressed: () async {
+                await FirebaseAuth.instance.signOut();
+                Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(builder: (context) => LoginScreen()));
               })
         ],
       ),

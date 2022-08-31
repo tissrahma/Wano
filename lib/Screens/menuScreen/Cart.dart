@@ -3,8 +3,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/Screens/Login/login_screen.dart';
 import 'package:flutter_application_1/Screens/list_product.dart';
+import 'package:flutter_application_1/Screens/menuScreen/ClientEssai.dart';
 import 'package:flutter_application_1/Screens/menuScreen/CommandeScreen.dart';
 import 'package:flutter_application_1/Screens/menuScreen/Navigator.dart';
+import 'package:flutter_application_1/Screens/menuScreen/ProductModel.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'ClientScreen.dart';
 
 class Cart extends StatefulWidget {
@@ -40,6 +43,8 @@ getDocIds(String name) async {
   });
 }
 
+User user = FirebaseAuth.instance.currentUser!;
+String _uid = user.uid;
 Future<String> getClientname() async {
   User user = FirebaseAuth.instance.currentUser!;
   String _uid = user.uid;
@@ -58,6 +63,7 @@ Future<String> getphone() async {
   return await _name;
 }
 
+@override
 Future<String> getaddress() async {
   User user = FirebaseAuth.instance.currentUser!;
   String _uid = user.uid;
@@ -98,6 +104,7 @@ class _CartState extends State<Cart> {
     super.initState();
   }
 
+  final items = List<String>.generate(20, (i) => 'Item ${i + 1}');
   double Totale = 0.0;
   // addCommande() async {
   //   User user = FirebaseAuth.instance.currentUser!;
@@ -125,11 +132,10 @@ class _CartState extends State<Cart> {
         title: Text("YOUR CART"),
         actions: [
           IconButton(
-              icon: Icon(Icons.exit_to_app),
+              icon: Icon(Icons.keyboard_return),
               onPressed: () async {
-                await FirebaseAuth.instance.signOut();
                 Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(builder: (context) => LoginScreen()));
+                    MaterialPageRoute(builder: (context) => ClientEssai()));
               })
         ],
       ),
@@ -143,130 +149,157 @@ class _CartState extends State<Cart> {
         )),
       ),
       body: Container(
-        child: ListView.builder(
-            shrinkWrap: true,
-            itemCount: productList.length,
-            itemBuilder: (context, index) {
-              return Container(
-                height: 100,
-                width: 100,
-                child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      SizedBox(
-                        width: 10,
-                        height: 50,
-                      ),
-                      CircleAvatar(
-                        radius: 40, // Image radius
-                        backgroundImage:
-                            NetworkImage(productList[index].image.toString()),
-                      ),
-                      SizedBox(
-                        width: 20,
-                      ),
-                      Expanded(
-                        child: Text(
-                          productList[index].name.toString(),
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20,
+          height: 700,
+          child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: productList.length,
+              itemBuilder: (context, index) {
+                String item = items[index];
+                return Dismissible(
+                  key: UniqueKey(),
+                  onDismissed: (direction) {
+                    setState(() {
+                      getDocIds(productList[index].name.toString());
+                      productList.removeAt(index);
+                      items.removeAt(index);
+                    });
+                    // Then show a snackbar.
+                    ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('$item dismissed')));
+                  },
+                  child: Container(
+                    height: 100,
+                    width: 100,
+                    child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          SizedBox(
+                            width: 10,
+                            height: 50,
                           ),
-                        ),
-                      ),
-                      Text(
-                        productList[index].price.toString() + "€",
-                        style: TextStyle(
-                          fontSize: 18,
-                        ),
-                      ),
-                      IconButton(
-                          onPressed: () async {
-                            User user = FirebaseAuth.instance.currentUser!;
-                            String _uid = user.uid;
-                            if (docId.isEmpty) {
-                              getDocIds(productList[index].name.toString());
-                            } else {
-                              await FirebaseFirestore.instance
-                                  .collection('cart' + _uid)
-                                  .doc(docId.last)
-                                  .update({
-                                'quantity': productList[index].quantiy! + 1
-                              });
-                              Totale = double.parse(productList[index].price!) *
-                                  productList[index].quantiy!;
+                          CircleAvatar(
+                            radius: 40, // Image radius
+                            backgroundImage: NetworkImage(
+                                productList[index].image.toString()),
+                          ),
+                          SizedBox(
+                            width: 20,
+                          ),
+                          Expanded(
+                            child: Text(
+                              productList[index].name.toString(),
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20,
+                              ),
+                            ),
+                          ),
+                          Text(
+                            productList[index].price.toString() + "€",
+                            style: TextStyle(
+                              fontSize: 18,
+                            ),
+                          ),
+                          IconButton(
+                              onPressed: () async {
+                                User user = FirebaseAuth.instance.currentUser!;
+                                String _uid = user.uid;
+                                if (docId.isEmpty) {
+                                  getDocIds(productList[index].name.toString());
+                                } else {
+                                  await FirebaseFirestore.instance
+                                      .collection('cart' + _uid)
+                                      .doc(docId.last)
+                                      .update({
+                                    'quantity': productList[index].quantiy! + 1
+                                  });
+                                  Totale =
+                                      double.parse(productList[index].price!) *
+                                          productList[index].quantiy!;
 
-                              docId.clear();
-                              print("vvvvvvvvvvvvvv");
-                              print(Totale);
-                            }
-                            final snackBar = SnackBar(
-                              content: const Text(
-                                  "you have added a new item to the cart"),
-                            );
-                            ScaffoldMessenger.of(context)
-                                .showSnackBar(snackBar);
-                            setState(() {
-                              productList[index].quantiy =
-                                  productList[index].quantiy! + 1;
-                            });
-                          },
-                          icon: const Icon(Icons.add_circle)),
-                      Text(
-                        productList[index].quantiy.toString() + "€",
-                        style: TextStyle(
-                          fontSize: 18,
-                        ),
-                      ),
-                      SizedBox(
-                        height: 30,
-                      ),
-                      IconButton(
-                          onPressed: () async {
-                            User user = FirebaseAuth.instance.currentUser!;
-                            String _uid = user.uid;
-                            if (docId.isEmpty) {
-                              getDocIds(productList[index].name.toString());
-                            } else {
-                              await FirebaseFirestore.instance
-                                  .collection('cart' + _uid)
-                                  .doc(docId.last)
-                                  .update({
-                                'quantity': productList[index].quantiy! - 1
-                              });
-                              Totale = double.parse(productList[index].price!) *
-                                  productList[index].quantiy!;
+                                  docId.clear();
+                                  print("vvvvvvvvvvvvvv");
+                                  print(Totale);
+                                }
+                                final snackBar = SnackBar(
+                                  content: const Text(
+                                      "you have added a new item to the cart"),
+                                );
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(snackBar);
+                                setState(() {
+                                  productList[index].quantiy =
+                                      productList[index].quantiy! + 1;
+                                });
+                              },
+                              icon: const Icon(Icons.add_circle)),
+                          Text(
+                            productList[index].quantiy.toString() + "€",
+                            style: TextStyle(
+                              fontSize: 18,
+                            ),
+                          ),
+                          SizedBox(
+                            height: 30,
+                          ),
+                          IconButton(
+                              onPressed: () async {
+                                User user = FirebaseAuth.instance.currentUser!;
+                                String _uid = user.uid;
+                                if (docId.isEmpty) {
+                                  getDocIds(productList[index].name.toString());
+                                } else {
+                                  await FirebaseFirestore.instance
+                                      .collection('cart' + _uid)
+                                      .doc(docId.last)
+                                      .update({
+                                    'quantity': productList[index].quantiy! - 1
+                                  });
+                                  Totale =
+                                      double.parse(productList[index].price!) *
+                                          productList[index].quantiy!;
 
-                              docId.clear();
-                            }
-                            final snackBar = SnackBar(
-                              content: const Text(
-                                  "you have removed a new item to the cart"),
-                            );
-                            ScaffoldMessenger.of(context)
-                                .showSnackBar(snackBar);
-                            setState(() {
-                              productList[index].quantiy =
-                                  productList[index].quantiy! - 1;
-                            });
-                          },
-                          icon: const Icon(Icons.remove_circle)),
-                      SizedBox(
-                        height: 30,
-                      ),
-                    ]),
-              );
-            }),
-      ),
+                                  docId.clear();
+                                }
+                                final snackBar = SnackBar(
+                                  content: const Text(
+                                      "you have removed a new item to the cart"),
+                                );
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(snackBar);
+                                setState(() {
+                                  productList[index].quantiy =
+                                      productList[index].quantiy! - 1;
+                                });
+                              },
+                              icon: const Icon(Icons.remove_circle)),
+                          SizedBox(
+                            height: 30,
+                          ),
+                        ]),
+                  ),
+                );
+              })),
       floatingActionButton: FloatingActionButton(
-       
         backgroundColor: Colors.deepPurple[200],
         onPressed: () {
-         
-            
-            Navigator.of(context).pushReplacement(
-                MaterialPageRoute(builder: (context) => CommandeScreen()));
-          
+          Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (context) => CommandeScreen()));
+
+          Fluttertoast.showToast(
+              msg: "your order have been confirmed ",
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.CENTER,
+              timeInSecForIosWeb: 1,
+              backgroundColor: Colors.deepPurple[200],
+              textColor: Colors.white,
+              fontSize: 16.0);
+          // show("Toast plugin app",
+          //     duration: Toast.lengthShort,
+          //     gravity: Toast.center,
+          //     backgroundColor: Color(0xFFB39DDB),
+          //     textStyle: TextStyle(fontSize: 15, color: Colors.white),
+          //     backgroundRadius: 16.8);
         },
         child: const Icon(Icons.check),
       ),

@@ -133,15 +133,6 @@ class _AddMealFormState extends State<AddMealForm> {
                 SizedBox(
                   height: 30,
                 ),
-
-                // CachedNetworkImage(
-                //   imageUrl:
-                //       "https://firebasestorage.googleapis.com/v0/b/project1-cf751.appspot.com/o/image_picker2246698138651153800.jpg?alt=media&token=443bbf1e-3f34-4b35-8114-d2e7d9dc4456",
-                //   progressIndicatorBuilder: (context, url, downloadProgress) =>
-                //       CircularProgressIndicator(
-                //           value: downloadProgress.progress),
-                //   errorWidget: (context, url, error) => Icon(Icons.error),
-                // ),
                 FutureBuilder<String?>(
                   future: getImageFile(_image),
                   builder: (context, snap) {

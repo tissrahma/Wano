@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -11,10 +12,13 @@ class NavigatorHeader extends StatefulWidget {
 class _NavigatorHeaderState extends State<NavigatorHeader> {
   Future<String> getname() async {
     String? _uid = FirebaseAuth.instance.currentUser?.uid;
-    final DocumentSnapshot userDoc =
-        await FirebaseFirestore.instance.collection('users').doc(_uid).get();
-    String _name = await userDoc.get('fullname').toString();
-    return await _name;
+    if (_uid != null) {
+      final DocumentSnapshot userDoc =
+          await FirebaseFirestore.instance.collection('users').doc(_uid).get();
+      String _name = await userDoc.get('fullname').toString();
+      return await _name;
+    } else
+      return "";
   }
 
   Future<String> getImage() async {
@@ -51,9 +55,13 @@ class _NavigatorHeaderState extends State<NavigatorHeader> {
                   return Container(
                     width: 100,
                     height: 100,
-                    child: CircleAvatar(
-                      radius: 40, // Image radius
-                      backgroundImage: NetworkImage(snap.data.toString()),
+                    child: CachedNetworkImage(
+                      imageUrl: snap.data.toString(),
+                      progressIndicatorBuilder:
+                          (context, url, downloadProgress) =>
+                              CircularProgressIndicator(
+                                  value: downloadProgress.progress),
+                      errorWidget: (context, url, error) => Icon(Icons.error),
                     ),
                   );
                 }
@@ -63,6 +71,31 @@ class _NavigatorHeaderState extends State<NavigatorHeader> {
                   height: 100,
                   child: Icon(Icons.person),
                 );
+              }),
+          FutureBuilder<String>(
+              future: getname(),
+              builder: (context, AsyncSnapshot<String?> snap) {
+                if (snap.data != "" && snap.data != null) {
+                  return Column(
+                    children: [
+                      Text(
+                        "user connected : ",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                        ),
+                      ),
+                      Text(
+                        snap.data.toString().toUpperCase(),
+                        style: TextStyle(
+                            color: Colors.purple,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold),
+                      )
+                    ],
+                  );
+                } else
+                  return Container();
               }),
         ],
       ),
