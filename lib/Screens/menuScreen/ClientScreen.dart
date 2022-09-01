@@ -160,6 +160,18 @@ Widget DrawerList(context) {
   );
 }
 
+Widget DrawerEmp(context) {
+  return Container(
+    width: double.infinity,
+    color: Colors.white,
+    height: 500,
+    padding: EdgeInsets.only(top: 15),
+    child: Column(
+      children: [menuEmp(context)],
+    ),
+  );
+}
+
 menuItem(context) {
   return Column(
     children: [
@@ -266,5 +278,38 @@ menuItem(context) {
         ),
       ),
     ],
+  );
+}
+
+menuEmp(context) {
+  return InkWell(
+    onTap: () async {
+      await FirebaseAuth.instance.signOut();
+      await Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => LoginScreen()));
+    },
+    child: Padding(
+      padding: EdgeInsets.all(15),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 30,
+          ),
+          Icon(
+            Icons.logout_outlined,
+            size: 25,
+            color: Colors.black,
+          ),
+          SizedBox(
+            width: 30,
+          ),
+          Text(
+            "LogOut  ",
+            style: TextStyle(
+                color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold),
+          )
+        ],
+      ),
+    ),
   );
 }

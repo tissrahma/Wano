@@ -83,15 +83,6 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
       appBar: AppBar(
         backgroundColor: Colors.deepPurple[200],
         title: Text("employee interface "),
-        actions: [
-          IconButton(
-              icon: Icon(Icons.logout),
-              onPressed: () async {
-                await FirebaseAuth.instance.signOut();
-                await Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(builder: (context) => LoginScreen()));
-              })
-        ],
       ),
       drawer: Drawer(
         backgroundColor: Colors.white,
@@ -99,7 +90,7 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
             child: Container(
           height: 700,
           width: 100.0,
-          child: Column(children: [NavigatorHeader(), DrawerList(context)]),
+          child: Column(children: [NavigatorHeader(), DrawerEmp(context)]),
         )),
       ),
       body: Center(

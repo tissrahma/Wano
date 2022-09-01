@@ -130,16 +130,6 @@ class _ClientEssaiState extends State<ClientEssai> {
       appBar: AppBar(
         backgroundColor: Colors.deepPurple[200],
         title: Text(" Wano's restaurant "),
-        actions: [
-          IconButton(
-              icon: Icon(Icons.exit_to_app),
-              onPressed: () async {
-                await FirebaseAuth.instance.signOut();
-                productList.clear();
-                await Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(builder: (context) => LoginScreen()));
-              })
-        ],
       ),
       drawer: Drawer(
         backgroundColor: Colors.white,
@@ -198,47 +188,45 @@ class _ClientEssaiState extends State<ClientEssai> {
                             icon: const Icon(Icons.add_circle),
                             onPressed: isButtonActive[index]
                                 ? () async {
+                                    getDocIds(docs[index]['name']);
+
+                                    print("++++++++++++");
+                                    print(docId);
                                     if (FirebaseAuth
                                             .instance.currentUser?.uid !=
                                         null) {
-                                      if (docId.isEmpty) {
-                                        getDocIds(docs[index]['name']);
-                                      } else {
-                                        productList.add(ProductModel(
-                                            image: docs[index]['image'],
-                                            price: docs[index]['price'],
-                                            name: docs[index]['name'],
-                                            quantiy: 1));
-                                        Total = Total +
-                                            (double.parse(
-                                                docs[index]['price']));
+                                      productList.add(ProductModel(
+                                          image: docs[index]['image'],
+                                          price: docs[index]['price'],
+                                          name: docs[index]['name'],
+                                          quantiy: 1));
+                                      Total = Total +
+                                          (double.parse(docs[index]['price']));
 
-                                        String? _uid = FirebaseAuth
-                                            .instance.currentUser?.uid;
-                                        await FirebaseFirestore.instance
-                                            .collection(
-                                                "cart" + _uid.toString())
-                                            .doc(docId.last)
-                                            .set({
-                                          'userID': _uid,
-                                          'image': docs[index]['image'],
-                                          'name': docs[index]['name'],
-                                          'price': docs[index]['price'],
-                                          'quantity': 1,
-                                        }).then((value) =>
-                                                print("Record Inserted"));
-                                        docId.clear();
+                                      // String? _uid = FirebaseAuth
+                                      //     .instance.currentUser?.uid;
+                                      //  await FirebaseFirestore.instance
+                                      //      .collection("cart" + _uid.toString())
+                                      //      .doc(docId[0])
+                                      //      .set({
+                                      //    'userID': _uid,
+                                      //    'image': docs[index]['image'],
+                                      //  'name': docs[index]['name'],
+                                      //    'price': docs[index]['price'],
+                                      //    'quantity': 1,
+                                      //  }).then((value) =>
+                                      //         print("Record Inserted"));
+                                      docId.clear();
 
-                                        setState(() {
-                                          isButtonActive[index] = false;
-                                        });
-                                        final snackBar = SnackBar(
-                                          content: const Text(
-                                              "you have added a new item to the cart"),
-                                        );
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(snackBar);
-                                      }
+                                      setState(() {
+                                        isButtonActive[index] = false;
+                                      });
+                                      final snackBar = SnackBar(
+                                        content: const Text(
+                                            "you have added a new item to the cart"),
+                                      );
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(snackBar);
                                     } else
                                       Navigator.of(context).pushReplacement(
                                           MaterialPageRoute(

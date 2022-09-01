@@ -62,6 +62,15 @@ String? email = FirebaseAuth.instance.currentUser!.email;
 
 class _ComplaintsState extends State<Complaints> {
   @override
+  void initState() {
+    super.initState();
+    setState(() {
+      _titleController.clear();
+      _textController.clear();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
@@ -70,7 +79,6 @@ class _ComplaintsState extends State<Complaints> {
             IconButton(
                 icon: Icon(Icons.keyboard_return),
                 onPressed: () async {
-                  
                   Navigator.of(context).pushReplacement(
                       MaterialPageRoute(builder: (context) => ClientEssai()));
                 })

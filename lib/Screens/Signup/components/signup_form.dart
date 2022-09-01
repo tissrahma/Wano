@@ -256,8 +256,6 @@ class _SignUpFormState extends State<SignUpForm> {
               child: ElevatedButton(
                 onPressed: () async {
                   _image = await singleImagePicker();
-
-                  setState(() {});
                 },
                 child: Text("select image "),
               ),
@@ -268,7 +266,8 @@ class _SignUpFormState extends State<SignUpForm> {
             ElevatedButton(
               onPressed: () async {
                 try {
-                  Navigator.of(context).pushReplacement(
+                  await uploadImage(_image!);
+                  await Navigator.of(context).pushReplacement(
                       MaterialPageRoute(builder: (context) => ClientEssai()));
                 } on FirebaseAuthException catch (e) {
                   final snackBar = SnackBar(

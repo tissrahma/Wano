@@ -322,6 +322,7 @@ class _CartState extends State<Cart> {
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.deepPurple[200],
         onPressed: () {
+          
           Navigator.of(context).pushReplacement(
               MaterialPageRoute(builder: (context) => CommandeScreen()));
 

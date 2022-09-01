@@ -143,6 +143,7 @@ class _CommandeScreenState extends State<CommandeScreen> {
           IconButton(
               icon: Icon(Icons.keyboard_return),
               onPressed: () {
+                productList.clear();
                 Navigator.of(context).pushReplacement(
                     MaterialPageRoute(builder: (context) => ClientEssai()));
               })
