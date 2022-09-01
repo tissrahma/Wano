@@ -171,6 +171,7 @@ class _CartState extends State<Cart> {
                     key: UniqueKey(),
                     onDismissed: (direction) {
                       setState(() {
+                        isButtonActive[index] = true;
                         if (Total > 0) {
                           Total = Total -
                               ((double.parse(productList[index].price!) *
@@ -322,7 +323,6 @@ class _CartState extends State<Cart> {
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.deepPurple[200],
         onPressed: () {
-          
           Navigator.of(context).pushReplacement(
               MaterialPageRoute(builder: (context) => CommandeScreen()));
 

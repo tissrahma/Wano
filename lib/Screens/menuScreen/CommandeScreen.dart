@@ -11,6 +11,7 @@ import 'package:flutter_application_1/Screens/menuScreen/Navigator.dart';
 
 import 'package:flutter_application_1/Screens/menuScreen/ProductModel.dart';
 import 'package:flutter_application_1/Screens/menuScreen/ShowCommande.dart';
+import 'package:flutter_application_1/main.dart';
 
 import 'ClientScreen.dart';
 
@@ -144,6 +145,29 @@ class _CommandeScreenState extends State<CommandeScreen> {
               icon: Icon(Icons.keyboard_return),
               onPressed: () {
                 productList.clear();
+                Total = 0;
+                isButtonActive = [
+                  true,
+                  true,
+                  true,
+                  true,
+                  true,
+                  true,
+                  true,
+                  true,
+                  true,
+                  true,
+                  true,
+                  true,
+                  true,
+                  true,
+                  true,
+                  true,
+                  true,
+                  true,
+                  true,
+                  true,
+                ];
                 Navigator.of(context).pushReplacement(
                     MaterialPageRoute(builder: (context) => ClientEssai()));
               })

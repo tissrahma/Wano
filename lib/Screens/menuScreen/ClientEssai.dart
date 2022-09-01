@@ -6,6 +6,7 @@ import 'package:flutter_application_1/Screens/Login/login_screen.dart';
 import 'package:flutter_application_1/Screens/list_product.dart';
 import 'package:flutter_application_1/Screens/menuScreen/Cart.dart';
 import 'package:flutter_application_1/Screens/menuScreen/ProductModel.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import '../../main.dart';
 import 'ClientScreen.dart';
 import 'DataBase.dart';
@@ -93,6 +94,29 @@ class _ClientEssaiState extends State<ClientEssai> {
   @override
   void initState() {
     super.initState();
+    List<bool> isButtonActive = [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+    ];
+
     initialise();
   }
 
@@ -220,6 +244,7 @@ class _ClientEssaiState extends State<ClientEssai> {
 
                                       setState(() {
                                         isButtonActive[index] = false;
+                                       
                                       });
                                       final snackBar = SnackBar(
                                         content: const Text(
@@ -251,6 +276,15 @@ class _ClientEssaiState extends State<ClientEssai> {
               if (productList.length != 0) {
                 Navigator.of(context).pushReplacement(
                     MaterialPageRoute(builder: (context) => Cart()));
+              } else {
+                Fluttertoast.showToast(
+                    msg: "your cart is empty  ",
+                    toastLength: Toast.LENGTH_SHORT,
+                    gravity: ToastGravity.CENTER,
+                    timeInSecForIosWeb: 1,
+                    backgroundColor: Colors.deepPurple[200],
+                    textColor: Colors.white,
+                    fontSize: 16.0);
               }
             } else {
               Navigator.of(context).pushReplacement(
